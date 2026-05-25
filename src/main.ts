@@ -152,13 +152,21 @@ const landingPage = `
       <a href="/contact-support">Contact</a>
     </nav>
     <div class="header-right">
-      <div class="qr-code-container" title="Scan to download MyCalorieDoctor app">
-        <canvas id="qrCodeCanvas"></canvas>
-        <span class="qr-label">Scan to Install</span>
-      </div>
       <a class="nav-cta" href="/#download">Get Started</a>
     </div>
   </header>
+
+  <section class="qr-banner">
+    <div class="qr-banner-content">
+      <div class="qr-banner-text">
+        <h2>Download Now</h2>
+        <p>Scan with your phone to get started</p>
+      </div>
+      <div class="qr-banner-code" title="Scan to download MyCalorieDoctor app">
+        <canvas id="qrCodeCanvas"></canvas>
+      </div>
+    </div>
+  </section>
 
   <main id="top">
     <section class="hero">

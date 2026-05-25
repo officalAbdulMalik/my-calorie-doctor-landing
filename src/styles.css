@@ -154,6 +154,79 @@ img {
   gap: 14px;
 }
 
+.qr-banner {
+  width: 100%;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, rgba(170, 55, 0, 0.08) 0%, rgba(255, 115, 62, 0.05) 100%);
+  border-bottom: 1px solid rgba(224, 191, 181, 0.4);
+}
+
+.qr-banner-content {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+}
+
+.qr-banner-text {
+  text-align: center;
+  flex: 1;
+}
+
+.qr-banner-text h2 {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 12px 0;
+  color: var(--primary);
+  font-family: "Plus Jakarta Sans", Inter, sans-serif;
+}
+
+.qr-banner-text p {
+  font-size: 16px;
+  color: var(--text-variant);
+  margin: 0;
+}
+
+.qr-banner-code {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(26, 28, 28, 0.08);
+}
+
+.qr-banner-code canvas {
+  display: block;
+  border-radius: 8px;
+  width: 150px;
+  height: 150px;
+}
+
+@media (max-width: 768px) {
+  .qr-banner {
+    padding: 30px 16px;
+  }
+
+  .qr-banner-content {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .qr-banner-text h2 {
+    font-size: 24px;
+  }
+
+  .qr-banner-code canvas {
+    width: 120px;
+    height: 120px;
+  }
+}
+
 .qr-code-container {
   display: flex;
   flex-direction: column;
@@ -183,16 +256,6 @@ img {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
-}
-
-@media (max-width: 768px) {
-  .qr-code-container {
-    display: none;
-  }
-
-  .header-right {
-    gap: 12px;
-  }
 }
 
 .button-dark {
