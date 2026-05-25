@@ -1,4 +1,5 @@
 import './styles.css';
+import QRCode from 'qrcode';
 
 type Feature = {
   title: string;
@@ -150,7 +151,13 @@ const landingPage = `
       <a href="/#privacy">Privacy</a>
       <a href="/contact-support">Contact</a>
     </nav>
-    <a class="nav-cta" href="/#download">Get Started</a>
+    <div class="header-right">
+      <div class="qr-code-container" title="Scan to download MyCalorieDoctor app">
+        <canvas id="qrCodeCanvas"></canvas>
+        <span class="qr-label">Scan to Install</span>
+      </div>
+      <a class="nav-cta" href="/#download">Get Started</a>
+    </div>
   </header>
 
   <main id="top">
@@ -644,3 +651,33 @@ document.addEventListener('click', (event) => {
 
 window.addEventListener('popstate', render);
 render();
+
+// Generate QR Code
+const generateQRCode = async () => {
+  const canvas = document.querySelector<HTMLCanvasElement>('#qrCodeCanvas');
+  if (canvas) {
+    try {
+      // QR code links to the download section
+      const qrValue = `${window.location.origin}/#download`;
+      await QRCode.toCanvas(canvas, qrValue, {
+        width: 70,
+        margin: 1,
+        color: {
+          dark: '#aa3700',
+          light: '#ffffff',
+        },
+      });
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+    }
+  }
+};
+
+// Generate QR code on initial load and after render
+const originalRender = render;
+(window as any).render = function() {
+  originalRender();
+  setTimeout(generateQRCode, 0);
+};
+
+generateQRCode();
