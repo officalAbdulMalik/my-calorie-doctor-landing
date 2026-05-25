@@ -156,18 +156,19 @@ img {
 
 .qr-banner {
   width: 100%;
-  padding: 40px 20px;
+  margin-top: 40px;
+  padding: 30px 20px;
   background: linear-gradient(135deg, rgba(170, 55, 0, 0.08) 0%, rgba(255, 115, 62, 0.05) 100%);
-  border-bottom: 1px solid rgba(224, 191, 181, 0.4);
+  border: 1px solid rgba(224, 191, 181, 0.3);
+  border-radius: 16px;
 }
 
 .qr-banner-content {
-  max-width: 1120px;
-  margin: 0 auto;
+  max-width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 60px;
+  gap: 40px;
 }
 
 .qr-banner-text {
@@ -176,15 +177,15 @@ img {
 }
 
 .qr-banner-text h2 {
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 800;
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
   color: var(--primary);
   font-family: "Plus Jakarta Sans", Inter, sans-serif;
 }
 
 .qr-banner-text p {
-  font-size: 16px;
+  font-size: 14px;
   color: var(--text-variant);
   margin: 0;
 }
@@ -193,9 +194,9 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 16px;
   background: rgba(255, 255, 255, 0.8);
-  border-radius: 16px;
+  border-radius: 12px;
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 24px rgba(26, 28, 28, 0.08);
 }
@@ -203,27 +204,28 @@ img {
 .qr-banner-code canvas {
   display: block;
   border-radius: 8px;
-  width: 150px;
-  height: 150px;
+  width: 130px;
+  height: 130px;
 }
 
 @media (max-width: 768px) {
   .qr-banner {
-    padding: 30px 16px;
+    margin-top: 30px;
+    padding: 20px 16px;
   }
 
   .qr-banner-content {
     flex-direction: column;
-    gap: 30px;
+    gap: 20px;
   }
 
   .qr-banner-text h2 {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .qr-banner-code canvas {
-    width: 120px;
-    height: 120px;
+    width: 110px;
+    height: 110px;
   }
 }
 

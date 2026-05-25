@@ -156,18 +156,6 @@ const landingPage = `
     </div>
   </header>
 
-  <section class="qr-banner">
-    <div class="qr-banner-content">
-      <div class="qr-banner-text">
-        <h2>Download Now</h2>
-        <p>Scan with your phone to get started</p>
-      </div>
-      <div class="qr-banner-code" title="Scan to download MyCalorieDoctor app">
-        <canvas id="qrCodeCanvas"></canvas>
-      </div>
-    </div>
-  </section>
-
   <main id="top">
     <section class="hero">
       <div class="hero-copy">
@@ -181,6 +169,18 @@ const landingPage = `
           <a class="button button-secondary" href="#features">Explore Features</a>
         </div>
         <p class="trust-note">Built for everyday wellness tracking. Not medical advice.</p>
+
+        <section class="qr-banner">
+          <div class="qr-banner-content">
+            <div class="qr-banner-text">
+              <h2>Download Now</h2>
+              <p>Scan with your phone to get started</p>
+            </div>
+            <div class="qr-banner-code" title="Scan to download MyCalorieDoctor app">
+              <canvas id="qrCodeCanvas"></canvas>
+            </div>
+          </div>
+        </section>
       </div>
 
       <div class="hero-art" aria-label="Animated app screen previews">
