@@ -176,7 +176,6 @@ const landingPage = `
             <div class="qr-banner-text">
               <h2>Download Now</h2>
               <p>Scan with your phone to open the App Store listing.</p>
-              <a class="qr-banner-link" href="https://apps.apple.com/us/app/mycaloriedoctor/id6765860622" target="_blank" rel="noopener">https://apps.apple.com/us/app/mycaloriedoctor/id6765860622</a>
             </div>
             <div class="qr-banner-code" title="Scan to download MyCalorieDoctor app">
               <canvas id="qrCodeCanvas"></canvas>
