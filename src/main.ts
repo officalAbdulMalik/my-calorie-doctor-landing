@@ -29,6 +29,7 @@ type Faq = {
 };
 
 const supportEmail = 'support@mycaloriedoctor.com';
+const appStoreUrl = 'https://apps.apple.com/us/app/mycaloriedoctor/id6765860622';
 
 const features: Feature[] = [
   {
@@ -174,7 +175,8 @@ const landingPage = `
           <div class="qr-banner-content">
             <div class="qr-banner-text">
               <h2>Download Now</h2>
-              <p>Scan with your phone to get started</p>
+              <p>Scan with your phone to open the App Store listing.</p>
+              <a class="qr-banner-link" href="https://apps.apple.com/us/app/mycaloriedoctor/id6765860622" target="_blank" rel="noopener">https://apps.apple.com/us/app/mycaloriedoctor/id6765860622</a>
             </div>
             <div class="qr-banner-code" title="Scan to download MyCalorieDoctor app">
               <canvas id="qrCodeCanvas"></canvas>
@@ -393,7 +395,7 @@ const landingPage = `
         <p>Start tracking from your phone. Choose your store and install the app when it becomes available.</p>
       </div>
       <div class="store-grid">
-        <a class="store-button" href="mailto:${supportEmail}?subject=iOS%20App%20Access">
+        <a class="store-button" href="${appStoreUrl}" target="_blank" rel="noopener">
           <img src="/images/apple_logo.svg" alt="" />
           <span><small>Download on the</small>App Store</span>
         </a>
@@ -665,8 +667,7 @@ const generateQRCode = async () => {
   const canvas = document.querySelector<HTMLCanvasElement>('#qrCodeCanvas');
   if (canvas) {
     try {
-      // QR code links to the download section
-      const qrValue = `${window.location.origin}/#download`;
+      const qrValue = appStoreUrl;
       await QRCode.toCanvas(canvas, qrValue, {
         width: 70,
         margin: 1,
