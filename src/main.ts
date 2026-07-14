@@ -30,6 +30,7 @@ type Faq = {
 
 const supportEmail = 'support@mycaloriedoctor.com';
 const appStoreUrl = 'https://apps.apple.com/us/app/mycaloriedoctor/id6765860622';
+const googlePlayUrl = 'https://play.google.com/store/apps/details?id=com.mycaloriedoctor.nutrition.aiscan&pcampaignid=web_share';
 
 const features: Feature[] = [
   {
@@ -398,7 +399,7 @@ const landingPage = `
           <img src="/images/apple_logo.svg" alt="" />
           <span><small>Download on the</small>App Store</span>
         </a>
-        <a class="store-button" href="mailto:${supportEmail}?subject=Android%20App%20Access">
+        <a class="store-button" href="${googlePlayUrl}" target="_blank" rel="noopener">
           <img src="/images/google_logo.svg" alt="" />
           <span><small>Get it on</small>Google Play</span>
         </a>
