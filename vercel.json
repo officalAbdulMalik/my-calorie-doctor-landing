@@ -1,11 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/contact-support",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/contact-support/",
+      "source": "/((?!images/).*)",
       "destination": "/index.html"
     }
   ]
