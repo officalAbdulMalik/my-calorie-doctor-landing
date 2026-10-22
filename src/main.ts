@@ -1,118 +1,164 @@
 import './styles.css';
 import QRCode from 'qrcode';
 
-type Feature = {
+// ---------------------------------------------------------------------------
+// Content
+// ---------------------------------------------------------------------------
+
+const brand = 'Mycaloriedoctor';
+const supportEmail = 'support@Mycaloriedoctor.com';
+const appStoreUrl = 'https://apps.apple.com/us/app/Mycaloriedoctor/id6765860622';
+const googlePlayUrl =
+  'https://play.google.com/store/apps/details?id=com.mycaloriedoctor.nutrition.aiscan&pcampaignid=web_share';
+const privacyUrl = 'https://sites.google.com/view/www-Mycaloriedoctor-vom/privacy-policy';
+const termsUrl = 'https://sites.google.com/view/www-Mycaloriedoctor-vom/terms-conditions';
+
+/**
+ * Real screenshots from the app, dropped into `public/screenshots/`.
+ * A missing file shows a labelled empty phone instead of a broken image, so
+ * the page still lays out while screenshots are being collected.
+ */
+type Screenshot = { file: string; label: string; alt: string };
+
+const shots = {
+  dashboard: {
+    file: '/screenshots/dashboard.png',
+    label: 'Dashboard',
+    alt: 'Dashboard showing the daily calorie ring, eaten vs target and fat, carb and protein totals',
+  },
+  scan: {
+    file: '/screenshots/scan.png',
+    label: 'Smart Scan camera',
+    alt: 'Smart Scan analysing a photo and identifying ingredients and nutrients',
+  },
+  scanResult: {
+    file: '/screenshots/scan-result.png',
+    label: 'Scan result',
+    alt: 'Scan result with calories, macros and ingredients',
+  },
+  search: {
+    file: '/screenshots/search.png',
+    label: 'Search Food',
+    alt: 'Search Food with AI results showing portion, calories and protein for each match',
+  },
+  plan: {
+    file: '/screenshots/plan.png',
+    label: 'Goals & targets',
+    alt: 'Profile screen with daily calorie, protein, carb and fat targets',
+  },
+  progress: {
+    file: '/screenshots/progress.png',
+    label: 'Progress',
+    alt: 'Progress screen with streak, weight, average calories, BMI and progress photos',
+  },
+} satisfies Record<string, Screenshot>;
+
+type WhyItem = {
   title: string;
   copy: string;
   icon: string;
-  image?: string;
-  imageAlt?: string;
+  shot: Screenshot;
+  photo: string;
 };
 
-type Step = {
+type Story = {
   number: string;
+  chip: string;
   title: string;
   copy: string;
-  icon: string;
-  preview: string;
+  shot: Screenshot;
+  photo?: string;
 };
 
-type Review = {
-  name: string;
-  role: string;
-  quote: string;
+type Faq = { question: string; answer: string };
+
+const icons = {
+  camera:
+    '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  target:
+    '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  sparkles:
+    '<path d="M9.94 14.06 4 20M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/>',
+  trend: '<path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/>',
+  plus: '<path d="M5 12h14M12 5v14"/>',
+  minus: '<path d="M5 12h14"/>',
+  arrow: '<path d="M5 12h14M12 5l7 7-7 7"/>',
+  flame:
+    '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+  mail: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-10 6L2 7"/>',
 };
 
-type Faq = {
-  question: string;
-  answer: string;
-};
+const icon = (name: keyof typeof icons, size = 20) =>
+  `<svg class="icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]}</svg>`;
 
-const supportEmail = 'support@mycaloriedoctor.com';
-const appStoreUrl = 'https://apps.apple.com/us/app/mycaloriedoctor/id6765860622';
-const googlePlayUrl = 'https://play.google.com/store/apps/details?id=com.mycaloriedoctor.nutrition.aiscan&pcampaignid=web_share';
+const appleLogo =
+  '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>';
 
-const features: Feature[] = [
+const playLogo =
+  '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.018 13.298l-3.919 2.218-3.515-3.493 3.543-3.521 3.891 2.202a1.49 1.49 0 0 1 0 2.594zM1.337.924a1.486 1.486 0 0 0-.112.568v21.017c0 .217.045.419.124.6l11.155-11.087L1.337.924zm12.207 10.065l3.258-3.238L3.45.195a1.466 1.466 0 0 0-.946-.179l11.04 10.973zm0 2.067l-11 10.933c.298.036.612-.016.906-.183l13.324-7.54-3.23-3.21z"/></svg>';
+
+const whyItems: WhyItem[] = [
   {
-    title: 'Smart Meal Scan',
-    copy: 'Take a photo of your meal and get quick nutrition estimates powered by AI. No more manual searching for ingredients or portion sizes.',
-    icon: '◎',
+    title: 'Smart meal scan',
+    copy: 'Point your camera at a plate. The AI names the dish, lists each ingredient and estimates calories, protein, carbs and fat. You adjust portions before anything is saved.',
+    icon: 'camera',
+    shot: shots.scanResult,
+    photo: '/images/hero-bowl.jpg',
   },
   {
-    title: 'Calorie & Macro Tracking',
-    copy: 'Track daily calories and macros with a dashboard designed for fast, simple decisions. Real-time feedback helps you stay on track.',
-    icon: '◫',
-    image: '/images/onboarding_slide_1_bowl.png',
-    imageAlt: 'Food bowl scan preview',
+    title: 'Search any food',
+    copy: 'No photo? Type what you ate, like "chicken biryani" or "2 eggs and toast", and log the closest match in one tap.',
+    icon: 'search',
+    shot: shots.search,
+    photo: '/images/meal-board.jpg',
   },
   {
-    title: 'AI Meal Plans',
-    copy: 'Create a personalized daily nutrition plan based on your goals and body metrics. Adjust as your progress evolves.',
-    icon: '✕',
+    title: 'A plan built for you',
+    copy: 'Share your goal, body metrics and activity level. You get daily calorie and macro targets, and a timeline you can actually follow.',
+    icon: 'target',
+    shot: shots.plan,
+    photo: '/images/table-spread.jpg',
   },
   {
-    title: 'What to Eat Next',
-    copy: 'Get meal recommendations that fit the rest of your day. Based on your remaining macros and nutrition preferences, the AI recommends practical next meals.',
-    icon: '⌕',
-    image: '/images/onboarding_meal_plans_food.jpg',
-    imageAlt: 'AI meal plan preview',
+    title: 'What to eat next',
+    copy: 'Meal ideas that fit the calories and macros you have left today, so the next decision is an easy one.',
+    icon: 'sparkles',
+    shot: shots.dashboard,
+    photo: '/images/hero-bowl.jpg',
   },
   {
-    title: 'Progress Tracking',
-    copy: 'Follow your consistency, calorie trends, and body progress in one clear place. Beautiful charts make your journey visible and rewarding.',
-    icon: '↗',
+    title: 'Progress you can see',
+    copy: 'Streaks, calorie trends, weight and before-and-after photos, all in one calm view.',
+    icon: 'trend',
+    shot: shots.progress,
+    photo: '/images/meal-board.jpg',
   },
 ];
 
-const steps: Step[] = [
+const stories: Story[] = [
   {
-    number: '1',
-    title: 'Create Your Profile',
-    copy: 'Set your specific goals, body metrics, food preferences, and dietary restrictions. Your personalised journey starts here.',
-    icon: '◎',
-    preview: 'Tell MyCalorieDoctor your goals, body details, food preferences, and daily routine so the app can shape your nutrition plan from the start.',
+    number: '01',
+    chip: 'Snap your plate',
+    title: 'Your next meal is one photo away',
+    copy: 'Smart Scan reads the whole plate, not just the main item, and turns it into calories and macros you can edit.',
+    shot: shots.scan,
+    photo: '/images/hero-bowl.jpg',
   },
   {
-    number: '2',
-    title: 'Log Your Meals',
-    copy: 'Scan, search, or speak to log a meal in seconds. No manual calorie counting, just point and log.',
-    icon: '◫',
-    preview: 'Use image scanning, search, or quick entry to save meals fast. The app turns your logs into clear calorie and macro progress.',
+    number: '02',
+    chip: 'Or just type it',
+    title: 'Search any food',
+    copy: 'Already eaten? Type it in.',
+    shot: shots.search,
   },
   {
-    number: '3',
-    title: 'Follow Your Plan',
-    copy: 'Receive and follow your AI-generated daily nutrition plan. It evolves with your feedback and progress in real time.',
-    icon: '▣',
-    preview: 'Your AI-curated nutrition plan adapts daily to keep you on track without boring repetition.',
-  },
-  {
-    number: '4',
-    title: 'Track Progress',
-    copy: 'Watch your nutrition and wellness stats transform. Celebrate milestones and stay motivated with data-driven insights.',
-    icon: '↗',
-    preview: 'Review calorie trends, streaks, macros, weight changes, and progress photos so every improvement is easy to understand.',
-  },
-];
-
-const reviews: Review[] = [
-  {
-    name: 'Maya R.',
-    role: 'Busy professional',
-    quote:
-      'The scan flow made tracking feel light instead of tedious. I can see calories and macros without turning every meal into homework.',
-  },
-  {
-    name: 'Daniel K.',
-    role: 'Strength training',
-    quote:
-      'The What to Eat Next suggestions are the part I use every day. It helps me make a quick meal choice that still fits my target.',
-  },
-  {
-    name: 'Aisha M.',
-    role: 'Wellness routine',
-    quote:
-      'I like that the app feels calm and visual. Progress tracking keeps me consistent without making the experience feel clinical.',
+    number: '03',
+    chip: 'Log it, done',
+    title: 'Adjust and save',
+    copy: 'Tweak portions, then log.',
+    shot: shots.scanResult,
+    photo: '/images/meal-board.jpg',
   },
 ];
 
@@ -120,19 +166,337 @@ const faqs: Faq[] = [
   {
     question: 'How accurate is the AI meal scan?',
     answer:
-      'AI scan results are estimates. Users should review the food, portion size, and nutrition details before saving a log.',
+      'Scan results are estimates. The app shows every ingredient and portion it detected, and you can adjust them before saving the meal to your log.',
   },
   {
-    question: 'Is my data safe and private?',
+    question: 'Can I log food without taking a photo?',
     answer:
-      'MyCalorieDoctor does not sell personal information. Data is processed to provide app functionality, personalization, and support.',
+      'Yes. Search lets you type a food or a whole meal, like "2 eggs and toast", and log it in one tap. You can also re-log anything from your recent meals.',
   },
   {
-    question: 'Where can I get the app?',
-    answer:
-      'Use the App Store or Google Play buttons on this page. They can point to the live store listings as soon as the app is published.',
+    question: 'Does it replace advice from a doctor or dietitian?',
+    answer: `No. ${brand} is built for everyday wellness tracking. It is not a medical device and does not provide medical advice, diagnosis or treatment.`,
+  },
+  {
+    question: 'Is my data private?',
+    answer: `We don't sell your personal data. Your meals, photos and body metrics are used to run the app and personalise your plan. The Privacy Policy explains exactly what is collected and why.`,
+  },
+  {
+    question: 'How much does it cost?',
+    answer: `${brand} is a subscription app. Current plans, and any free trial you're eligible for, are shown in the app before you subscribe. Billing and cancellation are handled by the App Store or Google Play.`,
+  },
+  {
+    question: 'Which phones does it work on?',
+    answer: 'iPhone and Android. Download it from the App Store or Google Play.',
   },
 ];
+
+// ---------------------------------------------------------------------------
+// Building blocks
+// ---------------------------------------------------------------------------
+
+const phone = (shot: Screenshot, className = '', eager = false) => `
+  <figure class="device ${className}">
+    <span class="device-island" aria-hidden="true"></span>
+    <img
+      src="${shot.file}"
+      alt="${shot.alt}"
+      loading="${eager ? 'eager' : 'lazy'}"
+      decoding="async"
+      onerror="this.closest('.device').classList.add('is-missing')"
+    />
+    <figcaption class="device-missing">Screenshot<strong>${shot.label}</strong></figcaption>
+  </figure>
+`;
+
+const storeBadges = (className = '') => `
+  <div class="store-badges ${className}">
+    <a class="store-badge" href="${appStoreUrl}" target="_blank" rel="noopener">
+      ${appleLogo}
+      <span><small>Download on the</small>App Store</span>
+    </a>
+    <a class="store-badge" href="${googlePlayUrl}" target="_blank" rel="noopener">
+      ${playLogo}
+      <span><small>Get it on</small>Google Play</span>
+    </a>
+  </div>
+`;
+
+const header = (variant: 'overlay' | 'solid') => `
+  <header class="site-header ${variant === 'solid' ? 'is-solid' : ''}" data-header="${variant}">
+    <div class="header-inner">
+      <a class="brand" href="/" aria-label="${brand} home">
+        <img class="brand-logo" src="/images/logo-96.png" alt="" width="34" height="34" />
+        <span>${brand}</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="/#how-it-works">How it works</a>
+        <a href="/#features">Features</a>
+        <a href="/#faq">FAQ</a>
+        <a href="/contact-support">Support</a>
+      </nav>
+      <a class="nav-cta" href="/#download">Download</a>
+    </div>
+  </header>
+`;
+
+const footer = () => `
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a class="brand" href="/" aria-label="${brand} home">
+            <img class="brand-logo" src="/images/logo-96.png" alt="" width="34" height="34" />
+            <span>${brand}</span>
+          </a>
+          <p>AI calorie, macro and meal planning for everyday wellness tracking.</p>
+        </div>
+        <nav class="footer-column" aria-label="Product links">
+          <h3>Product</h3>
+          <a href="/#how-it-works">How it works</a>
+          <a href="/#features">Features</a>
+          <a href="/#download">Download</a>
+        </nav>
+        <nav class="footer-column" aria-label="Legal links">
+          <h3>Legal</h3>
+          <a href="${privacyUrl}" target="_blank" rel="noopener">Privacy Policy</a>
+          <a href="${termsUrl}" target="_blank" rel="noopener">Terms &amp; Conditions</a>
+        </nav>
+        <div class="footer-column">
+          <h3>Support</h3>
+          <a href="/contact-support">Contact support</a>
+          <a href="mailto:${supportEmail}">${supportEmail}</a>
+        </div>
+      </div>
+      <p class="footer-disclaimer">
+        ${brand} is designed for general wellness and nutrition tracking. AI-generated estimates and suggestions may not always be accurate and should be reviewed by the user. This app is not a medical device and does not provide medical advice, diagnosis or treatment.
+      </p>
+      <div class="footer-bottom">
+        <span>© ${new Date().getFullYear()} ${brand}. All rights reserved.</span>
+        <span>Available on iOS &amp; Android</span>
+      </div>
+    </div>
+  </footer>
+`;
+
+// ---------------------------------------------------------------------------
+// Pages
+// ---------------------------------------------------------------------------
+
+const landingPage = () => `
+  ${header('overlay')}
+
+  <main id="top">
+    <section class="hero">
+      <img class="hero-photo" src="/images/hero-bowl.jpg" alt="" fetchpriority="high" />
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-content">
+        <p class="hero-chip">AI calorie &amp; macro tracker</p>
+        <h1>Snap. Track.<br />Thrive.</h1>
+        <p class="hero-lede">Point your camera at any meal and see calories and macros in seconds. Or just type what you ate.</p>
+        ${storeBadges('hero-badges')}
+      </div>
+    </section>
+
+    <section class="section how" id="how-it-works">
+      <div class="container">
+        <div class="section-intro centered" data-reveal>
+          <p class="eyebrow">How it works</p>
+          <h2>Eat normally. We'll do the maths.</h2>
+          <p>Every meal you log becomes calories, protein, carbs and fat, measured against a plan built around your goal.</p>
+        </div>
+
+        <div class="bento" data-reveal>
+          <article class="bento-card bento-photo bento-a">
+            <img src="/images/meal-board.jpg" alt="A plated meal ready to scan" loading="lazy" />
+            <h3>Every plate becomes data</h3>
+          </article>
+          <article class="bento-card bento-stat bento-b">
+            ${icon('flame', 28)}
+            <strong>4</strong>
+            <p>numbers tracked for every meal: calories, protein, carbs and fat</p>
+          </article>
+          <article class="bento-card bento-photo bento-c">
+            <img src="/images/hero-bowl.jpg" alt="A colourful grain bowl" loading="lazy" />
+            <h3>Know what to eat next</h3>
+          </article>
+          <article class="bento-card bento-photo bento-d">
+            <img src="/images/table-spread.jpg" alt="A table of shared dishes" loading="lazy" />
+            <h3>Plans that fit real life</h3>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase">
+      <div class="container">
+        <div class="section-intro centered" data-reveal>
+          <p class="eyebrow">The app</p>
+          <h2>Your whole day, at a glance.</h2>
+        </div>
+        <div class="showcase-stage" data-reveal>
+          ${phone(shots.dashboard, 'device-xl')}
+        </div>
+      </div>
+    </section>
+
+    <section class="section stories">
+      <div class="container">
+        <h2 class="stories-title" data-reveal>Logging that keeps up with you</h2>
+        <div class="story-grid" data-reveal>
+          ${stories
+            .map(
+              (story, index) => `
+                <article class="story-card ${index === 0 ? 'story-wide' : ''} ${story.photo ? 'has-photo' : ''}">
+                  ${story.photo ? `<img class="story-photo" src="${story.photo}" alt="" loading="lazy" />` : ''}
+                  <div class="story-chips">
+                    <span class="chip chip-number">${story.number}</span>
+                    <span class="chip">${story.chip}</span>
+                  </div>
+                  ${phone(story.shot, 'device-story')}
+                  <div class="story-text">
+                    <h3>${story.title}</h3>
+                    <p>${story.copy}</p>
+                  </div>
+                </article>
+              `,
+            )
+            .join('')}
+        </div>
+      </div>
+    </section>
+
+    <section class="why" id="features" style="--count: ${whyItems.length}">
+      <div class="why-sticky">
+        <div class="container why-layout">
+          <div class="why-head">
+            <p class="eyebrow">Why it works</p>
+            <h2>Smarter tracking, with a plan behind it</h2>
+          </div>
+          <p class="why-lede">${brand} isn't just a calorie counter. It turns what you eat into clear numbers, then tells you what to do next.</p>
+
+          <div class="why-list" role="tablist" aria-label="Features">
+            ${whyItems
+              .map(
+                (item, index) => `
+                  <button class="why-item" type="button" role="tab" data-why-index="${index}" aria-selected="false">
+                    <span class="why-item-icon">${icon(item.icon as keyof typeof icons)}</span>
+                    <span class="why-item-body">
+                      <span class="why-item-title">${item.title}</span>
+                      <span class="why-item-copy">${item.copy}</span>
+                    </span>
+                    <span class="why-item-toggle" aria-hidden="true">
+                      <span class="toggle-plus">${icon('plus', 16)}</span>
+                      <span class="toggle-minus">${icon('minus', 16)}</span>
+                    </span>
+                  </button>
+                `,
+              )
+              .join('')}
+            <div class="why-progress" aria-hidden="true">
+              ${whyItems.map(() => '<span></span>').join('')}
+            </div>
+          </div>
+
+          <div class="why-visuals">
+            ${whyItems
+              .map(
+                (item, index) => `
+                  <div class="why-visual" data-why-visual="${index}">
+                    <img class="why-visual-photo" src="${item.photo}" alt="" loading="lazy" />
+                    ${phone(item.shot, 'device-why')}
+                  </div>
+                `,
+              )
+              .join('')}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section download" id="download">
+      <div class="container">
+        <div class="download-card" data-reveal>
+          <div class="download-copy">
+            <p class="eyebrow eyebrow-light">Free to download</p>
+            <h2>Start your first scan today.</h2>
+            <p>Available on iPhone and Android. Set your goal, get your plan, then snap your first meal.</p>
+            ${storeBadges('download-badges')}
+            <div class="qr-block">
+              <canvas id="qrCodeCanvas" aria-label="QR code to the App Store listing"></canvas>
+              <span>Scan with your iPhone camera to open the App Store.</span>
+            </div>
+          </div>
+          <img class="download-photo" src="/images/salad-cutout.png" alt="" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq" id="faq">
+      <div class="container faq-layout">
+        <div class="faq-head" data-reveal>
+          <p class="eyebrow">FAQ</p>
+          <h2>Questions, answered.</h2>
+          <p>Something else on your mind? <a href="/contact-support">Contact support</a> and we'll reply within 48 hours.</p>
+        </div>
+        <div class="faq-list" data-reveal>
+          ${faqs
+            .map(
+              (faq) => `
+                <details>
+                  <summary>${faq.question}<span class="faq-toggle" aria-hidden="true">${icon('plus', 18)}</span></summary>
+                  <p>${faq.answer}</p>
+                </details>
+              `,
+            )
+            .join('')}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  ${footer()}
+`;
+
+const contactSupportPage = () => `
+  ${header('solid')}
+
+  <main class="support-page">
+    <div class="container support-layout">
+      <div class="support-copy">
+        <p class="eyebrow">Contact support</p>
+        <h1>How can we help?</h1>
+        <p>Questions about your account, billing, a bug, or an idea for the app. Send a message and your email app opens with it ready to go.</p>
+        <a class="support-email" href="mailto:${supportEmail}">
+          <span class="support-email-icon">${icon('mail')}</span>
+          <span><small>Email us directly</small>${supportEmail}</span>
+        </a>
+        <p class="support-note">We usually reply within 48 hours.</p>
+      </div>
+      <form class="contact-form" id="contactForm">
+        <label>
+          Name
+          <input id="contactName" name="name" type="text" placeholder="Your name" autocomplete="name" required />
+        </label>
+        <label>
+          Email
+          <input id="contactEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" required />
+        </label>
+        <label>
+          Message
+          <textarea id="contactMessage" name="message" rows="6" placeholder="Tell us what you need help with" required></textarea>
+        </label>
+        <button class="button-primary" type="submit">Send support email ${icon('arrow', 18)}</button>
+      </form>
+    </div>
+  </main>
+
+  ${footer()}
+`;
+
+// ---------------------------------------------------------------------------
+// Behaviour
+// ---------------------------------------------------------------------------
 
 const app = document.querySelector<HTMLDivElement>('#app');
 
@@ -140,438 +504,10 @@ if (!app) {
   throw new Error('App root was not found.');
 }
 
-const landingPage = `
-  <header class="site-header">
-    <a class="brand" href="/" aria-label="MyCalorieDoctor home">
-      <img class="brand-logo" src="/images/app_logo.png" alt="" />
-      <span>MyCalorieDoctor</span>
-    </a>
-    <nav class="nav-links" aria-label="Primary navigation">
-      <a href="/#features">Features</a>
-      <a href="/#how-it-works">How It Works</a>
-      <a href="/#download">Download</a>
-      <a href="/#privacy">Privacy</a>
-      <a href="/contact-support">Contact</a>
-    </nav>
-    <div class="header-right">
-      <a class="nav-cta" href="/#download">Get Started</a>
-    </div>
-  </header>
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const desktop = window.matchMedia('(min-width: 961px)');
 
-  <main id="top">
-    <section class="hero">
-      <div class="hero-copy">
-        <p class="eyebrow">AI-Powered Tracking</p>
-        <h1>MyCalorieDoctor</h1>
-        <p class="hero-lede">
-          Scan meals, track calories, and follow an AI-powered nutrition plan built around your goals. Achieve vitality through effortless daily tracking.
-        </p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="#download">Get Started Free</a>
-          <a class="button button-secondary" href="#features">Explore Features</a>
-        </div>
-        <p class="trust-note">Built for everyday wellness tracking. Not medical advice.</p>
-
-        <section class="qr-banner">
-          <div class="qr-banner-content">
-            <div class="qr-banner-text">
-              <h2>Download Now</h2>
-              <p>Scan with your phone to open the App Store listing.</p>
-            </div>
-            <div class="qr-banner-code" title="Scan to download MyCalorieDoctor app">
-              <canvas id="qrCodeCanvas"></canvas>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <div class="hero-art" aria-label="Animated app screen previews">
-        <div class="nutrition-board">
-          <span>Today’s Nutrition</span>
-          <strong>Looking great, keep it up!</strong>
-          <div class="board-macro">
-            <div><span>Protein</span><b>134g / 160g</b></div>
-            <i class="protein-fill"></i>
-          </div>
-          <div class="board-macro">
-            <div><span>Carbohydrates</span><b>210g / 250g</b></div>
-            <i class="carbs-fill"></i>
-          </div>
-          <div class="board-macro">
-            <div><span>Fat</span><b>48g / 60g</b></div>
-            <i class="fat-fill"></i>
-          </div>
-          <div class="board-rings">
-            <div><b>70%</b><span>Calories</span></div>
-            <div><b>50%</b><span>Hydration</span></div>
-          </div>
-        </div>
-        <div class="burn-card">
-          <span>🔥</span>
-          <small>Calories burned</small>
-          <b>386 kcal</b>
-          <em>30 min walk + gym</em>
-        </div>
-        <div class="nutrition-chip chip-protein">45g protein</div>
-        <div class="nutrition-chip chip-carbs">60g carbs</div>
-        <div class="nutrition-chip chip-fat">35g fat</div>
-        <div class="orbit-dot dot-one"></div>
-        <div class="orbit-dot dot-two"></div>
-        <div class="hero-phone hero-phone-main">
-          <div class="phone-island"></div>
-          <div class="mock-screen dashboard-screen">
-            <div class="mock-header">
-              <strong>Dashboard</strong>
-              <span>⚙</span>
-            </div>
-            <div class="date-card">
-              <b>May 2026</b>
-              <div class="date-row">
-                <span>Mon<br><b>18</b></span>
-                <span>Tue<br><b>19</b></span>
-                <span>Wed<br><b>20</b></span>
-                <span class="active">Sat<br><b>23</b></span>
-              </div>
-            </div>
-            <div class="calorie-card">
-              <div class="calorie-ring">
-                <b>5,500</b>
-                <span>Calorie</span>
-              </div>
-              <div class="cal-row">
-                <span>Eaten<br><b>0 Cal</b></span>
-                <span>Target<br><b>5500 Cal</b></span>
-              </div>
-              <div class="macro-bars">
-                <i class="fat"></i><i class="carbs"></i><i class="protein"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="hero-phone hero-phone-side progress-mock">
-          <div class="phone-island small"></div>
-          <div class="mock-screen">
-            <div class="mock-header">
-              <strong>Progress</strong>
-              <span>⚙</span>
-            </div>
-            <div class="streak-card">🔥 <b>1-day streak</b><small>Nice start. Keep it going today.</small></div>
-            <div class="metric-grid">
-              <div class="metric-orange"><span>Weight</span><b>156.0 kg</b></div>
-              <div><span>Avg Calories</span><b>0</b></div>
-              <div><span>BMI</span><b>3.4</b></div>
-            </div>
-          </div>
-        </div>
-        <div class="floating-scan-card">
-          <img src="/images/onboarding_slide_1_bowl.png" alt="AI scanned burrito bowl" />
-          <div>
-            <b>720 kcal</b>
-            <span>45g protein · 60g carbs</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section feature-section" id="features">
-      <div class="section-heading centered">
-        <h2>Empowered by Intelligence</h2>
-        <p>The next generation of personal nutrition management.</p>
-      </div>
-      <div class="feature-mosaic">
-        ${features
-          .map(
-            (feature) => `
-              <article class="feature-tile ${feature.image ? 'feature-image-tile' : ''}">
-                ${
-                  feature.image
-                    ? `<img src="${feature.image}" alt="${feature.imageAlt ?? ''}" />`
-                    : `
-                      <div class="feature-symbol">${feature.icon}</div>
-                      <h3>${feature.title}</h3>
-                      <p>${feature.copy}</p>
-                    `
-                }
-              </article>
-            `,
-          )
-          .join('')}
-      </div>
-    </section>
-
-    <section class="section steps-section" id="how-it-works">
-      <div class="steps-layout">
-        <div class="steps-line">
-          ${steps
-            .map(
-              (step, index) => `
-                <article class="step-item ${index === 0 ? 'is-active' : ''}" data-step-index="${index}">
-                  <span class="step-number step-${index + 1}">${step.number}</span>
-                  <div>
-                    <h3>${step.title}</h3>
-                    <p>${step.copy}</p>
-                  </div>
-                </article>
-              `,
-            )
-            .join('')}
-        </div>
-        <aside class="steps-preview-card" aria-label="Step preview">
-          <span class="steps-preview-icon" id="stepsPreviewIcon">${steps[0].icon}</span>
-          <h2 id="stepsPreviewTitle">${steps[0].title}</h2>
-          <p id="stepsPreviewCopy">${steps[0].preview}</p>
-        </aside>
-      </div>
-    </section>
-
-    <section class="dashboard-band">
-      <div class="dashboard-copy">
-        <p class="dashboard-eyebrow">Your Command Centre</p>
-        <h2>A Dashboard <span>Built for Life</span></h2>
-        <p>Experience a UI that breathes. No clutter, just the data you need to make smarter choices throughout your day.</p>
-        <ul>
-          <li>Interactive macro breakdowns with trend analysis</li>
-          <li>Dynamic water and activity tracking throughout the day</li>
-          <li>Smart meal motivations and goal reminders</li>
-          <li>Weekly reports delivered straight to your inbox</li>
-        </ul>
-      </div>
-      <div class="dashboard-showcase" aria-label="Dashboard, log history, progress, and scan result previews">
-        <article class="showcase-card wide-card">
-          <span class="mini-label">Home</span>
-          <div class="mini-calorie-ring"><b>5,500</b><small>Calorie</small></div>
-          <div class="showcase-macros">
-            <span class="fat">Fat 0g</span>
-            <span class="carbs">Carb 0g</span>
-            <span class="protein">Prot 0g</span>
-          </div>
-        </article>
-        <article class="showcase-card">
-          <span class="mini-label">Log History</span>
-          <div class="log-row">
-            <img src="/images/onboarding_slide_1_bowl.png" alt="Burrito bowl meal" />
-            <div><b>Spicy Chicken Bowl</b><small>720 kcal · Breakfast</small></div>
-          </div>
-        </article>
-        <article class="showcase-card orange-card">
-          <span>Weight</span>
-          <b>156.0 kg</b>
-          <small>↑ 0.0kg</small>
-        </article>
-        <article class="showcase-card scan-detail-card">
-          <img src="/images/onboarding_slide_1_bowl.png" alt="AI scan meal details" />
-          <div>
-            <b>720 kcal</b>
-            <small>60g carbs · 45g protein · 35g fat</small>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="section reviews-section">
-      <div class="section-heading centered">
-        <h2>Loved by Consistent Trackers</h2>
-        <p>Realistic, calm nutrition support for people who want clarity without complexity.</p>
-      </div>
-      <div class="review-grid">
-        ${reviews
-          .map(
-            (review) => `
-              <article class="review-card">
-                <div class="stars">★★★★★</div>
-                <p>“${review.quote}”</p>
-                <strong>${review.name}</strong>
-                <span>${review.role}</span>
-              </article>
-            `,
-          )
-          .join('')}
-      </div>
-    </section>
-
-    <section class="section download-section" id="download">
-      <div class="section-heading centered">
-        <h2>Download MyCalorieDoctor</h2>
-        <p>Start tracking from your phone. Choose your store and install the app when it becomes available.</p>
-      </div>
-      <div class="store-grid">
-        <a class="store-button" href="${appStoreUrl}" target="_blank" rel="noopener">
-          <img src="/images/apple_logo.svg" alt="" />
-          <span><small>Download on the</small>App Store</span>
-        </a>
-        <a class="store-button" href="${googlePlayUrl}" target="_blank" rel="noopener">
-          <img src="/images/google_logo.svg" alt="" />
-          <span><small>Get it on</small>Google Play</span>
-        </a>
-      </div>
-      <p class="billing-note">Subscriptions, if offered, are managed securely through Apple App Store or Google Play.</p>
-    </section>
-
-    <section class="section faq-section">
-      <div class="section-heading centered">
-        <h2>Frequently Asked Questions</h2>
-      </div>
-      <div class="faq-list">
-        ${faqs
-          .map(
-            (faq) => `
-              <details>
-                <summary>${faq.question}</summary>
-                <p>${faq.answer}</p>
-              </details>
-            `,
-          )
-          .join('')}
-      </div>
-    </section>
-
-    <section class="privacy-band" id="privacy">
-      <div class="privacy-icon">◇</div>
-      <div>
-        <h2>Your Privacy Is Our Priority</h2>
-        <p>We do not sell your data. Wellness data is used for personalization. AI suggestions may not always be accurate and should be reviewed by the user.</p>
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-top">
-        <div class="footer-brand">
-          <div class="footer-logo-row">
-            <img class="footer-logo" src="/images/app_logo.png" alt="" />
-            <strong>MyCalorieDoctor</strong>
-          </div>
-          <p>AI-powered calorie, macro, and meal planning app for everyday wellness tracking.</p>
-          <a href="mailto:${supportEmail}">${supportEmail}</a>
-        </div>
-        <nav class="footer-column" aria-label="Product links">
-          <h3>Product</h3>
-          <a href="/#features">Features</a>
-          <a href="/#how-it-works">How It Works</a>
-          <a href="/#download">Download</a>
-          <a href="/#top">App Preview</a>
-        </nav>
-        <nav class="footer-column" aria-label="Legal links">
-          <h3>Legal</h3>
-          <a href="https://sites.google.com/view/www-mycaloriedoctor-vom/privacy-policy">Privacy Policy</a>
-          <a href="https://sites.google.com/view/www-mycaloriedoctor-vom/terms-conditions">Terms & Conditions</a>
-        </nav>
-        <div class="footer-column">
-          <h3>Support</h3>
-          <a href="/contact-support">Contact Support</a>
-          <p>Available via email. We reply within 48 hours.</p>
-        </div>
-      </div>
-      <div class="footer-disclaimer">
-        <p><strong>Disclaimer:</strong> MyCalorieDoctor is designed for general wellness and nutrition tracking. AI-generated estimates and suggestions may not always be accurate and should be reviewed by the user. This app is not a medical device and does not provide medical advice, diagnosis, or treatment.</p>
-      </div>
-      <div class="footer-bottom">
-        <span>© 2026 MyCalorieDoctor. All rights reserved.</span>
-        <span>Available on iOS & Android</span>
-      </div>
-    </div>
-  </footer>
-`;
-
-const contactSupportPage = `
-  <header class="site-header">
-    <a class="brand" href="/" aria-label="MyCalorieDoctor home">
-      <img class="brand-logo" src="/images/app_logo.png" alt="" />
-      <span>MyCalorieDoctor</span>
-    </a>
-    <nav class="nav-links" aria-label="Primary navigation">
-      <a href="/#features">Features</a>
-      <a href="/#how-it-works">How It Works</a>
-      <a href="/#download">Download</a>
-      <a href="/#privacy">Privacy</a>
-      <a href="/contact-support">Contact</a>
-    </nav>
-    <a class="nav-cta" href="/#download">Get Started</a>
-  </header>
-
-  <main class="support-page">
-    <section class="support-hero">
-      <div>
-        <p class="eyebrow">Contact Support</p>
-        <h1>How can we help?</h1>
-        <p class="hero-lede">Send your question to the MyCalorieDoctor support team. Your email app will open with the message ready to send.</p>
-      </div>
-      <div class="support-card">
-        <img src="/images/app_logo.png" alt="" />
-        <strong>MyCalorieDoctor Support</strong>
-        <span>${supportEmail}</span>
-        <p>Available by email. We usually reply within 48 hours.</p>
-      </div>
-    </section>
-
-    <section class="section contact-section support-form-section">
-      <div class="contact-copy">
-        <h2>Contact Support</h2>
-        <p>Use this form for account questions, app issues, billing help, feature feedback, or partnership requests.</p>
-        <div class="contact-meta">
-          <strong>Support email</strong>
-          <a href="mailto:${supportEmail}">${supportEmail}</a>
-        </div>
-      </div>
-      <form class="contact-form" id="contactForm">
-        <label>
-          Name
-          <input id="contactName" name="name" type="text" placeholder="Your name" required />
-        </label>
-        <label>
-          Email
-          <input id="contactEmail" name="email" type="email" placeholder="you@example.com" required />
-        </label>
-        <label>
-          Message
-          <textarea id="contactMessage" name="message" rows="6" placeholder="Tell us what you need help with" required></textarea>
-        </label>
-        <button class="button button-primary" type="submit">Send Support Email</button>
-      </form>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-top">
-        <div class="footer-brand">
-          <div class="footer-logo-row">
-            <img class="footer-logo" src="/images/app_logo.png" alt="" />
-            <strong>MyCalorieDoctor</strong>
-          </div>
-          <p>AI-powered calorie, macro, and meal planning app for everyday wellness tracking.</p>
-          <a href="mailto:${supportEmail}">${supportEmail}</a>
-        </div>
-        <nav class="footer-column" aria-label="Product links">
-          <h3>Product</h3>
-          <a href="/#features">Features</a>
-          <a href="/#how-it-works">How It Works</a>
-          <a href="/#download">Download</a>
-          <a href="/#top">App Preview</a>
-        </nav>
-        <nav class="footer-column" aria-label="Legal links">
-          <h3>Legal</h3>
-          <a href="https://sites.google.com/view/www-mycaloriedoctor-vom/privacy-policy">Privacy Policy</a>
-          <a href="https://sites.google.com/view/www-mycaloriedoctor-vom/terms-conditions">Terms & Conditions</a>
-        </nav>
-        <div class="footer-column">
-          <h3>Support</h3>
-          <a href="/contact-support">Contact Support</a>
-          <p>Available via email. We reply within 48 hours.</p>
-        </div>
-      </div>
-      <div class="footer-disclaimer">
-        <p><strong>Disclaimer:</strong> MyCalorieDoctor is designed for general wellness and nutrition tracking. AI-generated estimates and suggestions may not always be accurate and should be reviewed by the user. This app is not a medical device and does not provide medical advice, diagnosis, or treatment.</p>
-      </div>
-      <div class="footer-bottom">
-        <span>© 2026 MyCalorieDoctor. All rights reserved.</span>
-        <span>Available on iOS & Android</span>
-      </div>
-    </div>
-  </footer>
-`;
+let cleanups: Array<() => void> = [];
 
 const bindContactForm = () => {
   const contactForm = document.querySelector<HTMLFormElement>('#contactForm');
@@ -582,63 +518,152 @@ const bindContactForm = () => {
     const email = document.querySelector<HTMLInputElement>('#contactEmail')?.value.trim() ?? '';
     const message = document.querySelector<HTMLTextAreaElement>('#contactMessage')?.value.trim() ?? '';
 
-    const subject = encodeURIComponent('MyCalorieDoctor Contact Request');
+    const subject = encodeURIComponent(`${brand} Contact Request`);
     const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
     window.location.href = `mailto:${supportEmail}?subject=${subject}&body=${body}`;
   });
 };
 
-let stepRotationTimer: number | undefined;
+/** Header sits transparent over the hero photo, then turns solid. */
+const bindHeader = () => {
+  const headerEl = document.querySelector<HTMLElement>('[data-header="overlay"]');
+  if (!headerEl) return;
 
-const bindStepTabs = () => {
-  window.clearInterval(stepRotationTimer);
+  const update = () => headerEl.classList.toggle('is-solid', window.scrollY > 24);
+  update();
+  window.addEventListener('scroll', update, { passive: true });
+  cleanups.push(() => window.removeEventListener('scroll', update));
+};
 
-  const stepItems = Array.from(document.querySelectorAll<HTMLElement>('.step-item[data-step-index]'));
-  const previewIcon = document.querySelector<HTMLElement>('#stepsPreviewIcon');
-  const previewTitle = document.querySelector<HTMLElement>('#stepsPreviewTitle');
-  const previewCopy = document.querySelector<HTMLElement>('#stepsPreviewCopy');
-
-  if (!stepItems.length || !previewIcon || !previewTitle || !previewCopy) {
+/** Fade sections in as they scroll into view. */
+const bindReveal = () => {
+  const targets = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
+  if (reducedMotion.matches || !('IntersectionObserver' in window)) {
+    targets.forEach((el) => el.classList.add('is-visible'));
     return;
   }
 
-  let activeStep = 0;
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { rootMargin: '0px 0px -10% 0px', threshold: 0.12 },
+  );
+  targets.forEach((el) => observer.observe(el));
+  cleanups.push(() => observer.disconnect());
+};
 
-  const setActiveStep = (index: number) => {
-    activeStep = index % steps.length;
+/**
+ * "Why it works": on desktop the section pins while you scroll and each
+ * stretch of scroll opens the next item. On smaller screens it's a normal
+ * accordion that rotates on its own until the user picks an item.
+ */
+const bindWhy = () => {
+  const section = document.querySelector<HTMLElement>('.why');
+  const items = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-why-index]'));
+  const visuals = Array.from(document.querySelectorAll<HTMLElement>('[data-why-visual]'));
+  const dots = Array.from(document.querySelectorAll<HTMLElement>('.why-progress span'));
+  if (!section || !items.length) return;
 
-    stepItems.forEach((item, itemIndex) => {
-      item.classList.toggle('is-active', itemIndex === activeStep);
+  let active = -1;
+  let timer: number | undefined;
+
+  const setActive = (index: number) => {
+    if (index === active) return;
+    active = index;
+    items.forEach((item, i) => {
+      item.classList.toggle('is-active', i === index);
+      item.setAttribute('aria-selected', String(i === index));
     });
-
-    const step = steps[activeStep];
-    previewIcon.textContent = step.icon;
-    previewTitle.textContent = step.title;
-    previewCopy.textContent = step.preview;
+    visuals.forEach((visual, i) => visual.classList.toggle('is-active', i === index));
+    dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
   };
 
+  const scrollRange = () => {
+    const top = section.getBoundingClientRect().top + window.scrollY;
+    return { top, length: section.offsetHeight - window.innerHeight };
+  };
+
+  const onScroll = () => {
+    if (!desktop.matches) return;
+    const { top, length } = scrollRange();
+    const progress = Math.min(Math.max((window.scrollY - top) / Math.max(length, 1), 0), 0.9999);
+    setActive(Math.floor(progress * items.length));
+  };
+
+  const stopRotation = () => window.clearInterval(timer);
   const startRotation = () => {
-    window.clearInterval(stepRotationTimer);
-    stepRotationTimer = window.setInterval(() => {
-      setActiveStep(activeStep + 1);
-    }, 3200);
+    stopRotation();
+    if (desktop.matches || reducedMotion.matches) return;
+    timer = window.setInterval(() => setActive((active + 1) % items.length), 4500);
   };
 
-  stepItems.forEach((item, index) => {
+  items.forEach((item, index) => {
     item.addEventListener('click', () => {
-      setActiveStep(index);
-      startRotation();
+      if (desktop.matches) {
+        const { top, length } = scrollRange();
+        window.scrollTo({
+          top: top + ((index + 0.5) / items.length) * length,
+          behavior: reducedMotion.matches ? 'auto' : 'smooth',
+        });
+      } else {
+        stopRotation();
+        setActive(index);
+      }
     });
   });
 
-  setActiveStep(0);
+  const onModeChange = () => {
+    onScroll();
+    startRotation();
+  };
+
+  setActive(0);
+  onScroll();
   startRotation();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  desktop.addEventListener('change', onModeChange);
+  cleanups.push(() => {
+    stopRotation();
+    window.removeEventListener('scroll', onScroll);
+    desktop.removeEventListener('change', onModeChange);
+  });
+};
+
+const generateQRCode = async () => {
+  const canvas = document.querySelector<HTMLCanvasElement>('#qrCodeCanvas');
+  if (!canvas) return;
+  try {
+    await QRCode.toCanvas(canvas, appStoreUrl, {
+      width: 96,
+      margin: 1,
+      color: { dark: '#111111', light: '#ffffff' },
+    });
+  } catch (error) {
+    console.error('Error generating QR code:', error);
+  }
 };
 
 const render = () => {
-  app.innerHTML = window.location.pathname === '/contact-support' ? contactSupportPage : landingPage;
+  cleanups.forEach((cleanup) => cleanup());
+  cleanups = [];
+
+  const isSupport = window.location.pathname.replace(/\/$/, '') === '/contact-support';
+  app.innerHTML = isSupport ? contactSupportPage() : landingPage();
+  document.title = isSupport
+    ? `Contact Support | ${brand}`
+    : `${brand} | AI-Powered Nutrition Tracking`;
+
   bindContactForm();
-  bindStepTabs();
+  bindHeader();
+  bindReveal();
+  bindWhy();
+  void generateQRCode();
 
   if (window.location.hash) {
     document.querySelector(window.location.hash)?.scrollIntoView();
@@ -655,38 +680,21 @@ document.addEventListener('click', (event) => {
   }
 
   event.preventDefault();
+
+  const samePage = link.pathname === window.location.pathname;
   history.pushState(null, '', link.href);
+
+  // An in-page anchor shouldn't re-render the page (and reset the header,
+  // animations and pinned section); just scroll to it.
+  if (samePage && link.hash) {
+    document.querySelector(link.hash)?.scrollIntoView({
+      behavior: reducedMotion.matches ? 'auto' : 'smooth',
+    });
+    return;
+  }
+
   render();
 });
 
 window.addEventListener('popstate', render);
 render();
-
-// Generate QR Code
-const generateQRCode = async () => {
-  const canvas = document.querySelector<HTMLCanvasElement>('#qrCodeCanvas');
-  if (canvas) {
-    try {
-      const qrValue = appStoreUrl;
-      await QRCode.toCanvas(canvas, qrValue, {
-        width: 70,
-        margin: 1,
-        color: {
-          dark: '#aa3700',
-          light: '#ffffff',
-        },
-      });
-    } catch (error) {
-      console.error('Error generating QR code:', error);
-    }
-  }
-};
-
-// Generate QR code on initial load and after render
-const originalRender = render;
-(window as any).render = function() {
-  originalRender();
-  setTimeout(generateQRCode, 0);
-};
-
-generateQRCode();
