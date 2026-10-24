@@ -209,13 +209,13 @@ const phone = (shot: Screenshot, className = '', eager = false) => `
   </figure>
 `;
 
-const storeBadges = (className = '') => `
-  <div class="store-badges ${className}">
-    <a class="store-badge" href="${appStoreUrl}" target="_blank" rel="noopener">
+const storeBadges = (placement: string) => `
+  <div class="store-badges ${placement}-badges">
+    <a class="store-badge" href="${appStoreUrl}" target="_blank" rel="noopener" data-store="App Store" data-placement="${placement}">
       ${appleLogo}
       <span><small>Download on the</small>App Store</span>
     </a>
-    <a class="store-badge" href="${googlePlayUrl}" target="_blank" rel="noopener">
+    <a class="store-badge" href="${googlePlayUrl}" target="_blank" rel="noopener" data-store="Google Play" data-placement="${placement}">
       ${playLogo}
       <span><small>Get it on</small>Google Play</span>
     </a>
@@ -294,7 +294,7 @@ const landingPage = () => `
         <p class="hero-chip">AI calorie &amp; macro tracker</p>
         <h1>Snap. Track.<br />Thrive.</h1>
         <p class="hero-lede">Point your camera at any meal and see calories and macros in seconds. Or just type what you ate.</p>
-        ${storeBadges('hero-badges')}
+        ${storeBadges('hero')}
       </div>
     </section>
 
@@ -421,7 +421,7 @@ const landingPage = () => `
             <p class="eyebrow eyebrow-light">Free to download</p>
             <h2>Start your first scan today.</h2>
             <p>Available on iPhone and Android. Set your goal, get your plan, then snap your first meal.</p>
-            ${storeBadges('download-badges')}
+            ${storeBadges('download')}
             <div class="qr-block">
               <canvas id="qrCodeCanvas" aria-label="QR code to the App Store listing"></canvas>
               <span>Scan with your iPhone camera to open the App Store.</span>
@@ -509,6 +509,23 @@ const desktop = window.matchMedia('(min-width: 961px)');
 
 let cleanups: Array<() => void> = [];
 
+/**
+ * Meta Pixel. The base code in index.html loads it and sends the first
+ * PageView; everything after that goes through here. No-ops if the pixel
+ * is blocked (ad blockers, privacy browsers).
+ */
+declare global {
+  interface Window {
+    fbq?: (command: 'track' | 'trackCustom', event: string, params?: Record<string, string>) => void;
+  }
+}
+
+const track = (event: string, params?: Record<string, string>) => {
+  window.fbq?.('track', event, params);
+};
+
+let hasRendered = false;
+
 const bindContactForm = () => {
   const contactForm = document.querySelector<HTMLFormElement>('#contactForm');
 
@@ -517,6 +534,8 @@ const bindContactForm = () => {
     const name = document.querySelector<HTMLInputElement>('#contactName')?.value.trim() ?? '';
     const email = document.querySelector<HTMLInputElement>('#contactEmail')?.value.trim() ?? '';
     const message = document.querySelector<HTMLTextAreaElement>('#contactMessage')?.value.trim() ?? '';
+
+    track('Contact', { content_name: 'Support form' });
 
     const subject = encodeURIComponent(`${brand} Contact Request`);
     const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
@@ -659,6 +678,11 @@ const render = () => {
     ? `Contact Support | ${brand}`
     : `${brand} | AI-Powered Nutrition Tracking`;
 
+  // The first PageView is sent by the base code; later client-side
+  // navigations would otherwise go unseen.
+  if (hasRendered) track('PageView');
+  hasRendered = true;
+
   bindContactForm();
   bindHeader();
   bindReveal();
@@ -671,6 +695,23 @@ const render = () => {
     window.scrollTo({ top: 0, behavior: 'auto' });
   }
 };
+
+// Store badge taps are the site's main conversion, so they're sent as Lead
+// (optimisable in Ads Manager without a custom conversion).
+document.addEventListener('click', (event) => {
+  const target = event.target as Element;
+  const badge = target.closest<HTMLAnchorElement>('a[data-store]');
+  if (badge) {
+    track('Lead', {
+      content_name: badge.dataset.store ?? '',
+      content_category: badge.dataset.placement ?? '',
+    });
+    return;
+  }
+  if (target.closest('a[href^="mailto:"]')) {
+    track('Contact', { content_name: 'Email link' });
+  }
+});
 
 document.addEventListener('click', (event) => {
   const link = (event.target as Element).closest<HTMLAnchorElement>('a[href^="/"]');
